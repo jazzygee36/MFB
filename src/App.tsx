@@ -1,0 +1,24 @@
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
+import Register from './components/pages/register';
+import LandingPage from './components/pages/landingPage';
+import SignIn from './components/pages/signIn';
+import PasswordReset from './components/pages/passwordReset';
+import OtpVerification from './components/pages/passwordReset/otp-verification';
+
+const App = () => {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Redirect from the root to /welcome */}
+        <Route path='/' element={<Navigate to='/welcome' />} />
+        <Route path='/welcome' element={<LandingPage />} />
+        <Route path='/register' element={<Register />} />
+        <Route path='/sign-in' element={<SignIn />} />
+        <Route path='/password-reset' element={<PasswordReset />} />
+        <Route path='/otp-verification' element={<OtpVerification />} />
+      </Routes>
+    </BrowserRouter>
+  );
+};
+
+export default App;
