@@ -36,7 +36,7 @@ const Register = () => {
       <div className='my-7'>
         <img src={Logo} alt='logo' className='' />
       </div>
-      <div className='w-[555px] bg-white p-12 rounded-md text-[#1E1E1E]'>
+      <div className='w-[95%] md:w-[555px] bg-white p-3 md:p-12 rounded-md text-[#1E1E1E]'>
         {!completeRegistration ? (
           <>
             <div className='text-center mb-12'>
@@ -108,7 +108,7 @@ const Register = () => {
           <CompleteRegistration />
         )}
       </div>
-      <div className='mt-[104px] mb-[63px]'>
+      <div className='mt-[104px] mb-[63px] w-[95%] md:w-full'>
         <p className='text-center text-[16px] font-[400]'>{progress} / 4</p>
         <ProgressBar step={step} />
       </div>

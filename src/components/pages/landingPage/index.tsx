@@ -17,7 +17,7 @@ const LandingPage = () => {
     description: string;
     buttonTitle?: string;
   }) => (
-    <div className='w-[555px] m-auto my-10 bg-white p-11 rounded-md text-[#1E1E1E] flex flex-col items-center'>
+    <div className='w-[95%] md:w-[555px] m-auto my-10 bg-white p-11 rounded-md text-[#1E1E1E] flex flex-col items-center'>
       <h1 className='text-center text-[30px] font-[400] font-roboto text-[#1B1E24] font-roboto'>
         {heading}
       </h1>
