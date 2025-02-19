@@ -7,6 +7,11 @@ import OtpVerification from './components/pages/passwordReset/otp-verification';
 import Dashboard from './components/pages/dashboard';
 
 const App = () => {
+  // PrivateRoute component
+  const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
+    const isAuthenticated = !!localStorage.getItem('token');
+    return isAuthenticated ? <>{children}</> : (window.location.href = '/');
+  };
   return (
     <BrowserRouter>
       <Routes>
@@ -17,7 +22,14 @@ const App = () => {
         <Route path='/sign-in' element={<SignIn />} />
         <Route path='/password-reset' element={<PasswordReset />} />
         <Route path='/otp-verification' element={<OtpVerification />} />
-        <Route path='/dashboard' element={<Dashboard />} />
+        <Route
+          path='/dashboard'
+          element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
