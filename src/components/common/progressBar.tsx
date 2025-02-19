@@ -27,11 +27,12 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ step }) => {
 
   return (
     <svg
-      width='458'
+      // width='458'
       height='12'
       viewBox='0 0 458 12'
       fill='none'
       xmlns='http://www.w3.org/2000/svg'
+      className='w-[95%] md:w-[458px] m-auto'
     >
       {/* Background bar (gray) */}
       <rect y='4' width='458' height='4' rx='2' fill='#E8ECEF' />

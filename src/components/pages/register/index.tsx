@@ -4,6 +4,7 @@ import CorporateForm from './corporate.form';
 import IndividualForm from './individual.form';
 import CompleteRegistration from './completeRegistration';
 import ProgressBar from '../../common/progressBar';
+import ChatBoxContainer from '../../common/chatBoxContainer';
 
 const Register = () => {
   const [activeTab, setActiveTab] = useState<'tab1' | 'tab2'>('tab1');
@@ -108,9 +109,10 @@ const Register = () => {
           <CompleteRegistration />
         )}
       </div>
-      <div className='mt-[104px] mb-[63px] w-[95%] md:w-full'>
+      <div className='mt-[104px] mb-[63px]  '>
         <p className='text-center text-[16px] font-[400]'>{progress} / 4</p>
         <ProgressBar step={step} />
+        <ChatBoxContainer />
       </div>
     </div>
   );

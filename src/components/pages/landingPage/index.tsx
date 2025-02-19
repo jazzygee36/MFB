@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import HomeButton from '../../common/homeButton';
 import MainLogo from '../../common/mainLogo';
+import ChatBoxContainer from '../../common/chatBoxContainer';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -58,6 +59,7 @@ const LandingPage = () => {
           onButtonClick={() => navigate('/register')}
         />
       </div>
+      <ChatBoxContainer />
     </>
   );
 };

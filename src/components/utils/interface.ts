@@ -18,10 +18,33 @@ export interface SelectProps {
   onChange: (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => void;
+  border?: string;
 }
 export interface ButtonProps {
   title: string;
-  onClick: () => void;
+  onClick?: () => void;
   bg: string;
   color: string;
+  type?: 'submit' | 'button';
+}
+export interface IndividualFormProps {
+  completeRegistration: boolean;
+  setCompleteRegistration: (value: boolean) => void;
+  setFormHeader: (value: boolean) => void;
+  setProgress: (value: number) => void;
+  step: number;
+  setStep: (value: number) => void;
+  nextStep: () => void;
+  prevStep: () => void;
+}
+
+export interface CorporateFormProps {
+  completeRegistration: boolean;
+  setCompleteRegistration: (value: boolean) => void;
+  setFormHeader: (value: boolean) => void;
+  setProgress: (value: number) => void;
+  step: number;
+  setStep: (value: number) => void;
+  nextStep: () => void;
+  prevStep: () => void;
 }

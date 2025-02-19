@@ -20,7 +20,7 @@ const HomeInput = ({
         value={value}
         onChange={onChange}
         onKeyPress={onKeyPress}
-        className={`h-[52px] w-full border-1 border-[#E8ECEF]  ${border} rounded-[2px] outline-none px-4 placeholder-[#98A9BC] placeholder:text-[14px] placeholder:font-[400]`}
+        className={` h-[52px] w-full border-1 border-[#E8ECEF]  ${border} rounded-[2px] outline-none px-4 placeholder-[#98A9BC] placeholder:text-[14px] placeholder:font-[400]`}
       />
     </div>
   );

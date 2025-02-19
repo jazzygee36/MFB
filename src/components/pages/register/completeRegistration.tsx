@@ -1,5 +1,7 @@
+import { useNavigate } from 'react-router-dom';
 import SuccessImg from '../../../assets/success.svg';
 const CompleteRegistration = () => {
+  const navigate = useNavigate();
   return (
     <div>
       <img src={SuccessImg} alt='success' className='m-auto justify-center' />
@@ -12,7 +14,10 @@ const CompleteRegistration = () => {
           your dashboard and start trading commodities.
         </p>
 
-        <h4 className='text-[#D71E0E] text-[14px] font-medium mt-[28px] cursor-pointer'>
+        <h4
+          className='text-[#D71E0E] text-[14px] font-medium mt-[28px] cursor-pointer'
+          onClick={() => navigate('/dashboard')}
+        >
           GO TO DASHBOARD
         </h4>
       </div>

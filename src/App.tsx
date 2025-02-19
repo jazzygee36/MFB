@@ -4,6 +4,7 @@ import LandingPage from './components/pages/landingPage';
 import SignIn from './components/pages/signIn';
 import PasswordReset from './components/pages/passwordReset';
 import OtpVerification from './components/pages/passwordReset/otp-verification';
+import Dashboard from './components/pages/dashboard';
 
 const App = () => {
   return (
@@ -16,6 +17,7 @@ const App = () => {
         <Route path='/sign-in' element={<SignIn />} />
         <Route path='/password-reset' element={<PasswordReset />} />
         <Route path='/otp-verification' element={<OtpVerification />} />
+        <Route path='/dashboard' element={<Dashboard />} />
       </Routes>
     </BrowserRouter>
   );

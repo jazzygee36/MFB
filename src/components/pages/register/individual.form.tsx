@@ -6,28 +6,27 @@ import {
   individualSchema,
   step1Schema,
   step2Schema,
+  step3Schema,
 } from '../../utils/validation';
 import SelectInput from '../../common/selectInput';
+import { IndividualFormProps } from '../../utils/interface';
+
+interface ValidationErrors {
+  firstName?: { _errors: string[] };
+  lastName?: { _errors: string[] };
+  phoneNumber?: { _errors: string[] };
+  password?: { _errors: string[] };
+  confirmPassword?: { _errors: string[] };
+  email?: { _errors: string[] };
+  code?: { _errors: number[] };
+}
 
 type FormData = z.infer<typeof individualSchema>;
-
-interface IndividualFormProps {
-  completeRegistration: boolean;
-  setCompleteRegistration: (value: boolean) => void;
-  setFormHeader: (value: boolean) => void;
-  setProgress: (value: number) => void;
-  step: number;
-  setStep: (value: number) => void;
-  nextStep: () => void;
-  prevStep: () => void;
-}
 
 const IndividualForm: FC<IndividualFormProps> = ({
   setCompleteRegistration,
   setFormHeader,
-
   step,
-
   nextStep,
   prevStep,
 }) => {
@@ -38,6 +37,7 @@ const IndividualForm: FC<IndividualFormProps> = ({
     confirmPassword: '',
     email: '',
     phoneNumber: '',
+    code: '',
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
@@ -51,42 +51,59 @@ const IndividualForm: FC<IndividualFormProps> = ({
     }));
   };
 
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault;
-  //   const result = individualSchema.safeParse(formData);
-  // };
-
   const handleNextStep = async () => {
     let result;
     if (step === 1) {
       result = step1Schema.safeParse(formData);
+      if (result.success) {
+        localStorage.setItem('email', formData.email);
+      }
     } else if (step === 2) {
       result = step2Schema.safeParse(formData);
+      if (result.success) {
+        localStorage.setItem('phoneNumber', formData.phoneNumber);
+      }
     } else {
-      // For other steps, use fullSchema or skip validation as needed.
       result = { success: true };
     }
 
     if (!result.success) {
-      const validationErrors = result.error?.format() || {};
+      const validationErrors = (result.error?.format() ||
+        {}) as ValidationErrors;
       setErrors((prevErrors) => ({
         ...prevErrors,
         ...(step === 1 && {
-          firstName: (validationErrors as any).firstName?._errors[0] || '',
-          lastName: (validationErrors as any).lastName?._errors[0] || '',
-          email: (validationErrors as any).email?._errors[0] || '',
+          firstName: validationErrors.firstName?._errors[0] || '',
+          lastName: validationErrors.lastName?._errors[0] || '',
+          email: validationErrors.email?._errors[0] || '',
         }),
         ...(step === 2 && {
-          password: (validationErrors as any).password?._errors[0] || '',
-          confirmPassword:
-            (validationErrors as any).confirmPassword?._errors[0] || '',
-          phoneNumber: (validationErrors as any).phoneNumber?._errors[0] || '',
+          password: validationErrors.password?._errors[0] || '',
+          confirmPassword: validationErrors.confirmPassword?._errors[0] || '',
+          phoneNumber: validationErrors.phoneNumber?._errors[0] || '',
         }),
       }));
       return; // Exit if validation fails
     }
 
     nextStep();
+  };
+
+  const handleFinishRegistration = () => {
+    // Validate step 3 using step3Schema
+    const result = step3Schema.safeParse(formData);
+    if (!result.success) {
+      const validationErrors = result.error?.format() || {};
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        code: validationErrors.code?._errors[0] || 'Code is required',
+      }));
+      return; // Do not finish registration if validation fails
+    }
+    nextStep();
+
+    // If valid, complete registration
+    setCompleteRegistration(true);
   };
 
   return (
@@ -133,7 +150,7 @@ const IndividualForm: FC<IndividualFormProps> = ({
           </div>
           <div className='mt-5'>
             <HomeInput
-              type={'text'}
+              type={'email'}
               placeholder={'Enter your Email'}
               label='Your Email'
               name='email'
@@ -193,7 +210,6 @@ const IndividualForm: FC<IndividualFormProps> = ({
           <div className='flex items-center gap-3'>
             <div className='w-[30%]'>
               <SelectInput
-                // label={'Phone Number'}
                 option={[
                   { value: 'option1', label: 'Option' },
                   { value: 'option2', label: 'Option 2' },
@@ -202,9 +218,9 @@ const IndividualForm: FC<IndividualFormProps> = ({
                 name={''}
                 value={''}
                 onChange={handleChange}
-                // border={
-                //   errors.phoneNumber ? 'border-[#EF4444]' : 'border-[#E8ECEF]'
-                // }
+                border={
+                  errors.phoneNumber ? 'border-[#EF4444]' : 'border-[#E8ECEF]'
+                }
               />
               {errors.phoneNumber && (
                 <p className='text-[#EF4444] text-[10px] font-medium'>
@@ -242,10 +258,30 @@ const IndividualForm: FC<IndividualFormProps> = ({
       {step === 3 && (
         <div>
           <p className='text-[14px] text-[#1E1E1E] mb-6 '>
-            Enter the 4-digit code that was sent to +23472639482 and
-            name@mymail.com
+            Enter the 4-digit code that was sent to{' '}
+            {localStorage.getItem('phoneNumber')} and{' '}
+            {localStorage.getItem('email')}
           </p>
-          <HomeInput type='text' placeholder='Enter code' />
+          <div>
+            <HomeInput
+              type='text'
+              placeholder='Enter code'
+              name='code'
+              value={formData.code}
+              onChange={handleChange}
+              border={errors.code ? 'border-[#EF4444]' : 'border-[#E8ECEF]'}
+              onKeyPress={(event: React.KeyboardEvent<HTMLInputElement>) => {
+                if (!/[0-9 +]/.test(event.key)) {
+                  event.preventDefault();
+                }
+              }}
+            />
+            {errors.code && (
+              <p className='text-[#EF4444] text-[10px] font-medium'>
+                {errors.code}
+              </p>
+            )}
+          </div>
           <p className='mt-2.5 text-[#98A9BCCC] text-[12px] text-center'>
             Resend Code
           </p>
@@ -265,14 +301,15 @@ const IndividualForm: FC<IndividualFormProps> = ({
           <div className='flex items-center justify-between w-full mt-44'>
             <h2
               onClick={() => {
-                setFormHeader(false), prevStep();
+                setFormHeader(false);
+                prevStep();
               }}
               className=' text-[14px] font-medium cursor-pointer'
             >
               BACK
             </h2>
             <h2
-              onClick={() => setCompleteRegistration(true)}
+              onClick={handleFinishRegistration}
               className='text-[#D71E0E] text-[14px] font-medium cursor-pointer'
             >
               FINISH
