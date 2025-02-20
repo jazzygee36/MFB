@@ -2,7 +2,7 @@ import { ErrorProps } from '../utils/interface';
 
 const ErrorMessage = ({ title, onClose }: ErrorProps) => {
   return (
-    <div className='relative m-auto mb-[46px] w-[419px] p-[21px] text-[#EF4444] font-[400] bg-[#FEF2F2] border border-[#EF4444] rounded-[10px] flex justify-between items-center'>
+    <div className='relative m-auto mb-[46px] w-[95%] md:w-[419px] p-[21px] text-[#EF4444] font-[400] bg-[#FEF2F2] border border-[#EF4444] rounded-[10px] flex justify-between items-center'>
       <span>{title}</span>
       <button onClick={onClose} className='cursor-pointer'>
         <svg
