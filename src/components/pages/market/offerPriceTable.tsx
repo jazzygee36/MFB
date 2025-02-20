@@ -47,12 +47,13 @@ const OfferPriceTable = () => {
             <th className='px-4 py-3 border-b-2 border-[#F2F4F6] text-left'>
               Products
             </th>
-            <th className='px-4 py-3 border-b-2 border-[#F2F4F6] text-left'>
+            <th className='px-4 py-3 border-b-2 border-[#F2F4F6] text-center '>
               Quantity
             </th>
             <th className='px-4 py-3 border-b-2 border-[#F2F4F6] text-left'>
-              Bid Price
+              Offer Price
             </th>
+            <th className='px-4 py-3 border-b-2 border-[#F2F4F6] text-left'></th>
           </tr>
         </thead>
       </table>
@@ -63,7 +64,7 @@ const OfferPriceTable = () => {
             {BidPrice.map((price, index) => (
               <tr
                 key={index}
-                className='text-[#1E1E1E] text-[14px] font-medium hover:bg-[#F8FAFB]'
+                className='text-[#1E1E1E] text-[14px] font-medium hover:bg-[#F8FAFB] text-left'
               >
                 <td className='px-4 py-4 border-b-2 border-[#F2F4F6]'>
                   {price.product}

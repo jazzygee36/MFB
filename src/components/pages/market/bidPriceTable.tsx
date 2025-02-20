@@ -46,12 +46,13 @@ const BidPriceTable = () => {
             <th className='px-4 py-3 border-b-2 border-[#F2F4F6] text-left'>
               Products
             </th>
-            <th className='px-4 py-3 border-b-2 border-[#F2F4F6] text-left'>
+            <th className='px-4 py-3 border-b-2 border-[#F2F4F6] text-center '>
               Quantity
             </th>
             <th className='px-4 py-3 border-b-2 border-[#F2F4F6] text-left'>
               Bid Price
             </th>
+            <th className='px-4 py-3 border-b-2 border-[#F2F4F6] text-left'></th>
           </tr>
         </thead>
       </table>
@@ -62,18 +63,18 @@ const BidPriceTable = () => {
             {BidPrice.map((price, index) => (
               <tr
                 key={index}
-                className='text-[#1E1E1E] text-[14px] font-medium hover:bg-[#F8FAFB]'
+                className='text-[#1E1E1E] text-[14px] font-medium hover:bg-[#F8FAFB] text-left'
               >
-                <td className='px-4 py-4 border-b-2 border-[#F2F4F6]'>
+                <td className='px-4 py-3 border-b-2 border-[#F2F4F6] '>
                   {price.product}
                 </td>
-                <td className='px-4 py-4 border-b-2 border-[#F2F4F6]'>
+                <td className='px-6 py-3 border-b-2 border-[#F2F4F6] '>
                   {price.quantity}
                 </td>
-                <td className='px-4 py-4 border-b-2 border-[#F2F4F6] text-[#52965E]'>
+                <td className='px-4 py-3 border-b-2 border-[#F2F4F6] text-[#52965E]'>
                   {price.price}
                 </td>
-                <td className='px-4 py-4 border-b-2 border-[#F2F4F6] text-[#52965E] cursor-pointer'>
+                <td className='  px-4 py-3 border-b-2 border-[#F2F4F6] text-[#52965E] cursor-pointer'>
                   <div className='border border-[#52965E] rounded-md py-1 px-2.5 text-center'>
                     {price.buy}
                   </div>
