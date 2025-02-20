@@ -4,7 +4,7 @@ import LandingPage from './components/pages/landingPage';
 import SignIn from './components/pages/signIn';
 import PasswordReset from './components/pages/passwordReset';
 import OtpVerification from './components/pages/passwordReset/otp-verification';
-import Dashboard from './components/pages/dashboard';
+import Dashboard from './components/pages/market';
 
 const App = () => {
   // PrivateRoute component
@@ -23,7 +23,7 @@ const App = () => {
         <Route path='/password-reset' element={<PasswordReset />} />
         <Route path='/otp-verification' element={<OtpVerification />} />
         <Route
-          path='/dashboard'
+          path='/market'
           element={
             <PrivateRoute>
               <Dashboard />
