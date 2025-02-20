@@ -8,7 +8,7 @@ const ChatBoxContainer = () => {
     <>
       {showChatWindow && <Chats />}
       <div
-        className='fixed bottom-7 right-7 bg-[#D71E0E] h-[60px] w-[60px] rounded-full flex justify-center items-center cursor-pointer'
+        className='fixed bottom-2 md:bottom-7 right-2 md:right-7 bg-[#D71E0E] h-[60px] w-[60px] rounded-full flex justify-center items-center cursor-pointer'
         onClick={() => setShowChatWindow(!showChatWindow)}
       >
         <ChatBox />

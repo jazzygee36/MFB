@@ -6,7 +6,7 @@ const Chats = () => {
       viewBox='0 0 195 69'
       fill='none'
       xmlns='http://www.w3.org/2000/svg'
-      className='float-end fixed bottom-5 right-28'
+      className='float-end fixed bottom-2 md:bottom-5 right-18 md:right-28'
     >
       <mask id='path-1-inside-1_5652_84' fill='white'>
         <path
