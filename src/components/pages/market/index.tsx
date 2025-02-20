@@ -2,6 +2,7 @@ import { useState } from 'react';
 import MainDashboard from '../../common/dashboard';
 import BidPriceTable from './bidPriceTable';
 import OfferPriceTable from './offerPriceTable';
+import TradeLogTable from './tradeLog';
 
 const Board = [
   { title: 'X-Traded' },
@@ -74,6 +75,10 @@ const Dashboard = () => {
         <div className='grid  grid-cols-1 md:grid-cols-2 gap-[9px] w-full'>
           <BidPriceTable />
           <OfferPriceTable />
+        </div>
+
+        <div className='mt-1'>
+          <TradeLogTable />
         </div>
       </div>
     </MainDashboard>
