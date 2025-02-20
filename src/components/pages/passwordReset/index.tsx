@@ -17,6 +17,7 @@ const PasswordReset = () => {
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [apiError, setApiError] = useState<string | null>(null);
+  const [processing, setProcessing] = useState<boolean>(false);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -40,6 +41,7 @@ const PasswordReset = () => {
       return; // Exit if validation fails
     }
     try {
+      setProcessing(true);
       const { email } = formData;
       const res = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/request-reset`,
@@ -59,6 +61,8 @@ const PasswordReset = () => {
         error.response?.data?.message ||
           'Something went wrong. Please try again.'
       );
+    } finally {
+      setProcessing(false);
     }
   };
   return (
@@ -66,7 +70,7 @@ const PasswordReset = () => {
       <div className='flex justify-center my-7'>
         <MainLogo />
       </div>
-      <div className='w-[95%] md:w-[555px] m-auto  bg-white p-11 rounded-md text-[#1E1E1E] flex flex-col items-center'>
+      <div className='w-[95%] md:w-[555px] m-auto  bg-white p-5 md:p-11 rounded-md text-[#1E1E1E] flex flex-col items-center'>
         <div className='mb-[40px]'>
           <h1 className='text-center text-[30px] font-[400] font-roboto text-[#1B1E24]'>
             Password Reset
@@ -116,7 +120,7 @@ const PasswordReset = () => {
             onClick={handleResetEmail}
             className='text-[#D71E0E] text-[14px] font-medium cursor-pointer'
           >
-            PROCEED
+            {processing ? 'PROCESSING...' : 'PROCEED'}
           </h2>
         </div>
       </div>
