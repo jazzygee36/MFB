@@ -32,7 +32,7 @@ const ProductView = () => {
   const [activeIndex, setActiveIndex] = useState(1); // Default active index is 1 ("Order Book")
 
   return (
-    <div className='p-2 bg-white h-[352px]'>
+    <div className='p-2 bg-white h-[352px] hidden md:block'>
       <input
         type='text'
         placeholder='search'
@@ -45,8 +45,8 @@ const ProductView = () => {
             key={index}
             onClick={() => setActiveIndex(index)}
             className={`flex gap-4 items-center my-8 cursor-pointer ml-6 ${
-              isActive ? 'text-red-500' : 'text-[#1E1E1E]'
-            } hover:text-red-500`}
+              isActive ? 'text-[#D71E0E]' : 'text-[#1E1E1E]'
+            } hover:text-[#D71E0E]`}
           >
             {/* Icon inherits color */}
             <div>{view.icon}</div>
