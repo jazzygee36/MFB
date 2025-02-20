@@ -10,6 +10,7 @@ import {
   corporateStep2Schema,
   corporateStep3Schema,
 } from '../../utils/validation';
+import axios from 'axios';
 
 interface ValidationErrors {
   companyName?: { _errors: string[] };
@@ -17,8 +18,8 @@ interface ValidationErrors {
   incorporationDate?: { _errors: string[] };
   password?: { _errors: string[] };
   confirmPassword?: { _errors: string[] };
-  companyEmail?: { _errors: string[] };
-  code?: { _errors: number[] };
+  email?: { _errors: string[] };
+  verificationCode?: { _errors: number[] };
 }
 
 type FormData = z.infer<typeof corporateSchema>;
@@ -30,36 +31,78 @@ const CorporateForm: FC<CorporateFormProps> = ({
   step,
   nextStep,
   prevStep,
+  setApiError,
 }) => {
   const [formData, setFormData] = useState<FormData>({
     companyName: '',
     businessType: '',
-    incorporationDate: '',
+    incorporationDate: new Date(),
     password: '',
     confirmPassword: '',
-    companyEmail: '',
-    code: '',
+    email: '',
+    verificationCode: '',
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-
+  const [loading, setLoading] = useState<boolean>(false);
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]:
+        name === 'incorporationDate'
+          ? new Date(value) // convert the date string to a Date object
+          : value,
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     let result;
     if (step === 1) {
       result = corporateStep1Schema.safeParse(formData);
     } else if (step === 2) {
       result = corporateStep2Schema.safeParse(formData);
       if (result.success) {
-        localStorage.setItem('email', formData.companyEmail);
+        localStorage.setItem('email', formData.email);
+
+        // Move API call here
+        try {
+          setLoading(true);
+          const {
+            companyName,
+            businessType,
+            password,
+
+            email,
+          } = formData;
+          const res = await axios.post(
+            `${import.meta.env.VITE_BASE_URL}/register-corporate`,
+            {
+              companyName,
+              businessType,
+              password,
+              incorporationDate:
+                formData.incorporationDate instanceof Date
+                  ? formData.incorporationDate.toISOString() // send ISO string
+                  : formData.incorporationDate,
+              email,
+            }
+          );
+
+          if (res.data.message === 'Successfully registered.') {
+            nextStep();
+          } else {
+            setApiError('Registration failed. Please try again.');
+          }
+        } catch (error: any) {
+          setApiError(
+            error.response?.data?.message ||
+              'Something went wrong. Please try again.'
+          );
+        } finally {
+          setLoading(false);
+        }
       }
     } else {
       result = { success: true };
@@ -79,13 +122,15 @@ const CorporateForm: FC<CorporateFormProps> = ({
         ...(step === 2 && {
           password: validationErrors.password?._errors[0] || '',
           confirmPassword: validationErrors.confirmPassword?._errors[0] || '',
-          companyEmail: validationErrors.companyEmail?._errors[0] || '',
+          email: validationErrors.email?._errors[0] || '',
         }),
       }));
       return; // Exit if validation fails
     }
 
-    nextStep();
+    if (step !== 2) {
+      nextStep(); // Proceed to next step only if it's not step 2 (handled inside API call)
+    }
   };
 
   useEffect(() => {
@@ -98,19 +143,41 @@ const CorporateForm: FC<CorporateFormProps> = ({
     console.log('completeRegistration updated:', completeRegistration);
   }, [completeRegistration]);
 
-  const handleFinishRegistration = () => {
+  const handleFinishRegistration = async () => {
     // Validate step 3 using corporateStep3Schema
     const result = corporateStep3Schema.safeParse(formData);
     if (!result.success) {
       const validationErrors = result.error?.format() || {};
       setErrors((prevErrors) => ({
         ...prevErrors,
-        code: validationErrors.code?._errors[0] || 'Code is required',
+        code:
+          validationErrors.verificationCode?._errors[0] || 'Code is required',
       }));
       return; // Do not finish registration if validation fails
     }
-    nextStep();
-    setCompleteRegistration(true);
+    try {
+      setLoading(true);
+      const { verificationCode, email } = formData;
+      const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/verify`, {
+        verificationCode,
+        email,
+      });
+
+      if (res.data.message === 'Email successfully verified') {
+        localStorage.setItem('token', res.data.token);
+        nextStep();
+        setCompleteRegistration(true);
+      } else {
+        setApiError('Registration failed. Please try again.');
+      }
+    } catch (error: any) {
+      setApiError(
+        error.response?.data?.message ||
+          'Something went wrong. Please try again.'
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -142,9 +209,11 @@ const CorporateForm: FC<CorporateFormProps> = ({
                   <SelectInput
                     label='Type of Business'
                     option={[
-                      { value: 'option1', label: 'Option 1' },
-                      { value: 'option2', label: 'Option 2' },
-                      { value: 'option3', label: 'Option 3' },
+                      { value: '', label: 'Select Type of Business' },
+                      { value: 'partnership', label: 'Partnership' },
+                      { value: 'cooperative', label: 'Cooperative' },
+                      { value: 'nonprofit', label: 'Nonprofit Organization' },
+                      { value: 'franchise', label: 'Franchise' },
                     ]}
                     name='businessType'
                     value={formData.businessType}
@@ -167,7 +236,11 @@ const CorporateForm: FC<CorporateFormProps> = ({
                     name='incorporationDate'
                     placeholder='Select Date'
                     label='Date of Incorporation'
-                    value={formData.incorporationDate}
+                    value={
+                      formData.incorporationDate
+                        ? formData.incorporationDate.toISOString().split('T')[0]
+                        : ''
+                    }
                     onChange={handleChange}
                     border={
                       errors.incorporationDate
@@ -190,20 +263,18 @@ const CorporateForm: FC<CorporateFormProps> = ({
               <div>
                 <HomeInput
                   type='email'
-                  name='companyEmail'
+                  name='email'
                   placeholder='Company email'
                   label='Company email'
-                  value={formData.companyEmail}
+                  value={formData.email}
                   onChange={handleChange}
                   border={
-                    errors.companyEmail
-                      ? 'border-[#EF4444]'
-                      : 'border-[#E8ECEF]'
+                    errors.email ? 'border-[#EF4444]' : 'border-[#E8ECEF]'
                   }
                 />
-                {errors.companyEmail && (
+                {errors.email && (
                   <p className='text-[#EF4444] text-[10px] font-medium'>
-                    {errors.companyEmail}
+                    {errors.email}
                   </p>
                 )}
               </div>
@@ -258,8 +329,8 @@ const CorporateForm: FC<CorporateFormProps> = ({
                 <HomeInput
                   type='text'
                   placeholder='Enter code'
-                  name='code'
-                  value={formData.code}
+                  name='verificationCode'
+                  value={formData.verificationCode}
                   onChange={handleChange}
                   border={errors.code ? 'border-[#EF4444]' : 'border-[#E8ECEF]'}
                   onKeyPress={(
@@ -270,9 +341,9 @@ const CorporateForm: FC<CorporateFormProps> = ({
                     }
                   }}
                 />
-                {errors.code && (
+                {errors.verificationCode && (
                   <p className='text-[#EF4444] text-[10px] font-medium'>
-                    {errors.code}
+                    {errors.verificationCode}
                   </p>
                 )}
               </div>
@@ -290,6 +361,7 @@ const CorporateForm: FC<CorporateFormProps> = ({
                 bg=''
                 onClick={handleSubmit}
                 color={'#D71E0E'}
+                disabled={loading}
               />
             )}
             {step === 3 && (

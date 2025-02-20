@@ -10,6 +10,7 @@ import {
 } from '../../utils/validation';
 import SelectInput from '../../common/selectInput';
 import { IndividualFormProps } from '../../utils/interface';
+import axios from 'axios';
 
 interface ValidationErrors {
   firstName?: { _errors: string[] };
@@ -18,7 +19,7 @@ interface ValidationErrors {
   password?: { _errors: string[] };
   confirmPassword?: { _errors: string[] };
   email?: { _errors: string[] };
-  code?: { _errors: number[] };
+  verificationCode?: { _errors: string[] };
 }
 
 type FormData = z.infer<typeof individualSchema>;
@@ -29,6 +30,7 @@ const IndividualForm: FC<IndividualFormProps> = ({
   step,
   nextStep,
   prevStep,
+  setApiError,
 }) => {
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
@@ -37,9 +39,11 @@ const IndividualForm: FC<IndividualFormProps> = ({
     confirmPassword: '',
     email: '',
     phoneNumber: '',
-    code: '',
+    verificationCode: '',
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -62,6 +66,30 @@ const IndividualForm: FC<IndividualFormProps> = ({
       result = step2Schema.safeParse(formData);
       if (result.success) {
         localStorage.setItem('phoneNumber', formData.phoneNumber);
+
+        // Move API call here
+        try {
+          setLoading(true);
+          const { firstName, lastName, password, email, phoneNumber } =
+            formData;
+          const res = await axios.post(
+            `${import.meta.env.VITE_BASE_URL}/register-individual`,
+            { firstName, lastName, password, email, phoneNumber }
+          );
+
+          if (res.data.message === 'Successfully registered.') {
+            nextStep();
+          } else {
+            setApiError('Registration failed. Please try again.');
+          }
+        } catch (error: any) {
+          setApiError(
+            error.response?.data?.message ||
+              'Something went wrong. Please try again.'
+          );
+        } finally {
+          setLoading(false);
+        }
       }
     } else {
       result = { success: true };
@@ -83,27 +111,49 @@ const IndividualForm: FC<IndividualFormProps> = ({
           phoneNumber: validationErrors.phoneNumber?._errors[0] || '',
         }),
       }));
-      return; // Exit if validation fails
+      return;
     }
 
-    nextStep();
+    if (step !== 2) {
+      nextStep(); // Proceed to next step only if it's not step 2 (handled inside API call)
+    }
   };
 
-  const handleFinishRegistration = () => {
+  const handleFinishRegistration = async () => {
     // Validate step 3 using step3Schema
     const result = step3Schema.safeParse(formData);
     if (!result.success) {
       const validationErrors = result.error?.format() || {};
       setErrors((prevErrors) => ({
         ...prevErrors,
-        code: validationErrors.code?._errors[0] || 'Code is required',
+        verificationCode:
+          validationErrors.verificationCode?._errors[0] || 'Code is required',
       }));
       return; // Do not finish registration if validation fails
     }
-    nextStep();
+    try {
+      setLoading(true);
+      const { verificationCode, email } = formData;
+      const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/verify`, {
+        verificationCode,
+        email,
+      });
 
-    // If valid, complete registration
-    setCompleteRegistration(true);
+      if (res.data.message === 'Email successfully verified') {
+        localStorage.setItem('token', res.data.token);
+        nextStep();
+        setCompleteRegistration(true);
+      } else {
+        setApiError('Registration failed. Please try again.');
+      }
+    } catch (error: any) {
+      setApiError(
+        error.response?.data?.message ||
+          'Something went wrong. Please try again.'
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -266,19 +316,23 @@ const IndividualForm: FC<IndividualFormProps> = ({
             <HomeInput
               type='text'
               placeholder='Enter code'
-              name='code'
-              value={formData.code}
+              name='verificationCode'
+              value={formData.verificationCode}
               onChange={handleChange}
-              border={errors.code ? 'border-[#EF4444]' : 'border-[#E8ECEF]'}
+              border={
+                errors.verificationCode
+                  ? 'border-[#EF4444]'
+                  : 'border-[#E8ECEF]'
+              }
               onKeyPress={(event: React.KeyboardEvent<HTMLInputElement>) => {
                 if (!/[0-9 +]/.test(event.key)) {
                   event.preventDefault();
                 }
               }}
             />
-            {errors.code && (
+            {errors.verificationCode && (
               <p className='text-[#EF4444] text-[10px] font-medium'>
-                {errors.code}
+                {errors.verificationCode}
               </p>
             )}
           </div>
@@ -295,6 +349,7 @@ const IndividualForm: FC<IndividualFormProps> = ({
             bg=''
             onClick={handleNextStep}
             color={'#D71E0E'}
+            disabled={loading}
           />
         )}
         {step === 3 && (

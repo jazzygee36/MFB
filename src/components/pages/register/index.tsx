@@ -5,6 +5,7 @@ import IndividualForm from './individual.form';
 import CompleteRegistration from './completeRegistration';
 import ProgressBar from '../../common/progressBar';
 import ChatBoxContainer from '../../common/chatBoxContainer';
+import ErrorMessage from '../../common/errorMessage';
 
 const Register = () => {
   const [activeTab, setActiveTab] = useState<'tab1' | 'tab2'>('tab1');
@@ -12,6 +13,7 @@ const Register = () => {
   const [formHeader, setFormHeader] = useState(false);
   const [progress, setProgress] = useState(1);
   const [step, setStep] = useState(1);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const nextStep = () => {
     setStep((prev) => prev + 1);
@@ -37,6 +39,15 @@ const Register = () => {
       <div className='my-7'>
         <img src={Logo} alt='logo' className='' />
       </div>
+
+      {apiError && (
+        <ErrorMessage
+          title={apiError}
+          onClose={() => {
+            setApiError(null);
+          }}
+        />
+      )}
       <div className='w-[95%] md:w-[555px] bg-white p-3 md:p-12 rounded-md text-[#1E1E1E]'>
         {!completeRegistration ? (
           <>
@@ -88,6 +99,7 @@ const Register = () => {
                       setStep={setStep}
                       nextStep={nextStep}
                       prevStep={prevStep}
+                      setApiError={setApiError}
                     />
                   ) : (
                     <CorporateForm
@@ -99,6 +111,7 @@ const Register = () => {
                       setStep={setStep}
                       nextStep={nextStep}
                       prevStep={prevStep}
+                      setApiError={setApiError}
                     />
                   )}
                 </div>

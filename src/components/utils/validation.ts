@@ -8,7 +8,7 @@ const baseIndividualSchema = z.object({
   phoneNumber: z.string().min(3, 'This field is required'),
   password: z.string().min(3, 'This field is required'),
   confirmPassword: z.string().min(3, 'This field is required'),
-  code: z.string().min(4, 'This field is required'),
+  verificationCode: z.string().min(4, 'This field is required'),
 });
 
 // Full schema with refinement for the entire form
@@ -40,7 +40,7 @@ export const step2Schema = baseIndividualSchema
   });
 
 export const step3Schema = baseIndividualSchema.pick({
-  code: true,
+  verificationCode: true,
 });
 
 export const signInSchema = z.object({
@@ -52,12 +52,14 @@ export const signInSchema = z.object({
 const baseCorporateSchema = z.object({
   companyName: z.string().min(3, 'This field is required'),
   businessType: z.string().min(3, 'This field is required'),
-  incorporationDate: z.string().min(3, 'This field is required'),
+  incorporationDate: z
+    .date()
+    .refine((date) => date !== null, { message: 'This field is required' }),
   password: z.string().min(3, 'This field is required'),
   confirmPassword: z.string().min(3, 'This field is required'),
-  companyEmail: z.string().email('Email address is incorrect.'),
+  email: z.string().email('Email address is incorrect.'),
 
-  code: z.string().min(4, 'This field is required'),
+  verificationCode: z.string().min(4, 'This field is required'),
 });
 
 export const corporateSchema = baseCorporateSchema.refine(
@@ -76,7 +78,7 @@ export const corporateStep1Schema = baseCorporateSchema.pick({
 
 export const corporateStep2Schema = baseCorporateSchema
   .pick({
-    companyEmail: true,
+    email: true,
     password: true,
     confirmPassword: true,
   })
@@ -86,11 +88,11 @@ export const corporateStep2Schema = baseCorporateSchema
   });
 
 export const corporateStep3Schema = baseIndividualSchema.pick({
-  code: true,
+  verificationCode: true,
 });
 
 export const otpVerifySchema = z.object({
-  code: z.string().min(3, 'This field is required.'),
+  verificationToken: z.string().min(3, 'This field is required.'),
 });
 export const resetSchema = z.object({
   email: z.string().email('Email address is incorrect.'),

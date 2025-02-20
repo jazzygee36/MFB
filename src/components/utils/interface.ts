@@ -26,6 +26,7 @@ export interface ButtonProps {
   bg: string;
   color: string;
   type?: 'submit' | 'button';
+  disabled?: boolean;
 }
 export interface IndividualFormProps {
   completeRegistration: boolean;
@@ -36,6 +37,7 @@ export interface IndividualFormProps {
   setStep: (value: number) => void;
   nextStep: () => void;
   prevStep: () => void;
+  setApiError: any;
 }
 
 export interface CorporateFormProps {
@@ -47,4 +49,9 @@ export interface CorporateFormProps {
   setStep: (value: number) => void;
   nextStep: () => void;
   prevStep: () => void;
+  setApiError: any;
+}
+export interface ErrorProps {
+  title: string;
+  onClose?: () => void;
 }
