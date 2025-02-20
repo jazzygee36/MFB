@@ -4,16 +4,20 @@ import MainLogo from '../../common/mainLogo';
 import React, { useState } from 'react';
 import { z } from 'zod';
 import { otpVerifySchema } from '../../utils/validation';
+import axios from 'axios';
+import ErrorMessage from '../../common/errorMessage';
 
 type FormData = z.infer<typeof otpVerifySchema>;
 
 const OtpVerification = () => {
   const navigate = useNavigate();
+  const storedEmail = localStorage.getItem('resetEmail') || '';
 
   const [formData, setFormData] = useState<FormData>({
     verificationCode: '',
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -25,7 +29,7 @@ const OtpVerification = () => {
     }));
   };
 
-  const handleResetPassword = (e: React.FormEvent) => {
+  const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     const result = otpVerifySchema.safeParse(formData);
 
@@ -34,17 +38,58 @@ const OtpVerification = () => {
       setErrors({
         code: validationErrors.verificationCode?._errors[0] || '',
       });
-      return; // Exit if validation fails
+      return;
     }
+    try {
+      const { verificationCode } = formData;
+      const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/verify`, {
+        verificationCode,
+        email: storedEmail,
+      });
 
-    navigate('/sign-in');
+      if (res.data.message === 'Reset code sent to email') {
+        navigate('/sign-in');
+      } else {
+        setApiError('Verification failed. Please try again.');
+      }
+    } catch (error: any) {
+      setApiError(
+        error.response?.data?.message ||
+          'Something went wrong. Please try again.'
+      );
+    }
   };
+
+  const handleResendCode = async () => {
+    try {
+      // Retrieve the email from localStorage
+      const email = storedEmail;
+      const res = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/request-reset`,
+        { email }
+      );
+
+      if (res.data.message === 'Reset code sent to email') {
+        // Optionally update the stored email if needed
+        localStorage.setItem('resetEmail', email);
+        navigate('/otp-verification');
+      } else {
+        setApiError('Resend failed. Please try again.');
+      }
+    } catch (error: any) {
+      setApiError(
+        error.response?.data?.message ||
+          'Something went wrong. Please try again.'
+      );
+    }
+  };
+
   return (
     <div className='flex flex-col justify-center'>
       <div className='flex justify-center my-7'>
         <MainLogo />
       </div>
-      <div className='w-[95%] md:w-[555px] m-auto  bg-white p-11 rounded-md text-[#1E1E1E] flex flex-col items-center'>
+      <div className='w-[95%] md:w-[555px] m-auto bg-white p-11 rounded-md text-[#1E1E1E] flex flex-col items-center'>
         <div className='mb-[40px]'>
           <h1 className='text-center text-[30px] font-[400] font-roboto text-[#1B1E24]'>
             Password Reset
@@ -55,12 +100,10 @@ const OtpVerification = () => {
         </div>
         <div className='w-full'>
           <HomeInput
-            type={'code'}
+            type={'text'}
             placeholder={'Enter your Code'}
-            label={`Enter the 4-digit code that was sent to ${localStorage.getItem(
-              'resetEmail'
-            )}`}
-            name='code'
+            label={`Enter the 4-digit code that was sent to ${storedEmail}`}
+            name='verificationCode'
             value={formData.verificationCode}
             onChange={handleChange}
             border={errors.code ? 'border-[#EF4444]' : 'border-[#E8ECEF]'}
@@ -76,13 +119,26 @@ const OtpVerification = () => {
             </p>
           )}
         </div>
-        <p className='text-center text-[#98A9BCCC] text-[12px] font-[400] mt-[15px]'>
+        <p
+          className='hover:underline text-center text-[#98A9BCCC] text-[12px] font-[400] mt-[15px] cursor-pointer'
+          onClick={handleResendCode}
+        >
           Resend Code
         </p>
-        <div className='flex items-center justify-between w-full mt-44'>
+        <div className='w-full my-12'>
+          {apiError && (
+            <ErrorMessage
+              title={apiError}
+              onClose={() => {
+                setApiError(null);
+              }}
+            />
+          )}
+        </div>
+        <div className='flex items-center justify-between w-full '>
           <h2
             onClick={() => navigate('/sign-in')}
-            className=' text-[14px] font-medium cursor-pointer'
+            className='text-[14px] font-medium cursor-pointer'
           >
             BACK
           </h2>

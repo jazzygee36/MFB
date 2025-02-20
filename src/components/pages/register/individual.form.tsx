@@ -260,11 +260,7 @@ const IndividualForm: FC<IndividualFormProps> = ({
           <div className='flex items-center gap-3'>
             <div className='w-[30%]'>
               <SelectInput
-                option={[
-                  { value: 'option1', label: 'Option' },
-                  { value: 'option2', label: 'Option 2' },
-                  { value: 'option3', label: 'Option 3' },
-                ]}
+                option={[{ value: '+123', label: '+123' }]}
                 name={''}
                 value={''}
                 onChange={handleChange}

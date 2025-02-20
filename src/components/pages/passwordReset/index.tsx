@@ -4,6 +4,8 @@ import MainLogo from '../../common/mainLogo';
 import { resetSchema } from '../../utils/validation';
 import { z } from 'zod';
 import { useState } from 'react';
+import axios from 'axios';
+import ErrorMessage from '../../common/errorMessage';
 
 type FormData = z.infer<typeof resetSchema>;
 
@@ -14,6 +16,7 @@ const PasswordReset = () => {
     email: '',
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -25,7 +28,7 @@ const PasswordReset = () => {
     }));
   };
 
-  const handleResetEmail = (e: React.FormEvent) => {
+  const handleResetEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     const result = resetSchema.safeParse(formData);
 
@@ -36,10 +39,27 @@ const PasswordReset = () => {
       });
       return; // Exit if validation fails
     }
-    if (result.success) {
-      localStorage.setItem('resetEmail', formData.email);
+    try {
+      const { email } = formData;
+      const res = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/request-reset`,
+        {
+          email,
+        }
+      );
+
+      if (res.data.message === 'Reset code sent to email') {
+        localStorage.setItem('resetEmail', formData.email);
+        navigate('/otp-verification');
+      } else {
+        setApiError('Login failed. Please try again.');
+      }
+    } catch (error: any) {
+      setApiError(
+        error.response?.data?.message ||
+          'Something went wrong. Please try again.'
+      );
     }
-    navigate('/otp-verification');
   };
   return (
     <div className='flex flex-col justify-center'>
@@ -74,9 +94,20 @@ const PasswordReset = () => {
         <p className='text-center text-[#98A9BCCC] text-[12px] font-[400] mt-[15px]'>
           Note that you’ll be sent an OTP to the email address provided
         </p>
+
+        <div className='w-full'>
+          {apiError && (
+            <ErrorMessage
+              title={apiError}
+              onClose={() => {
+                setApiError(null);
+              }}
+            />
+          )}
+        </div>
         <div className='flex items-center justify-between w-full mt-44'>
           <h2
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/sign-in')}
             className=' text-[14px] font-medium cursor-pointer'
           >
             BACK
