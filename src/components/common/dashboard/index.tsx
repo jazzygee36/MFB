@@ -22,7 +22,7 @@ const MainDashboard = ({ children }: Props) => {
             <Sidebar />
             <ProductView />
           </div>
-          {children}
+          <div className='flex flex-col h-full w-full'>{children}</div>
         </div>
       </div>
 
