@@ -16,7 +16,7 @@ const CompleteRegistration = () => {
 
         <h4
           className='text-[#D71E0E] text-[14px] font-medium mt-[28px] cursor-pointer'
-          onClick={() => navigate('/dashboard')}
+          onClick={() => navigate('/market')}
         >
           GO TO DASHBOARD
         </h4>

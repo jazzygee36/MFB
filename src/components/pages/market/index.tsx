@@ -1,7 +1,7 @@
 import MainDashboard from '../../common/dashboard';
 
 const Dashboard = () => {
-  return <MainDashboard>Main</MainDashboard>;
+  return <MainDashboard>Market</MainDashboard>;
 };
 
 export default Dashboard;

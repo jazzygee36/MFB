@@ -58,7 +58,7 @@ const SignIn = () => {
 
       if (res.data.message === 'Login successfully') {
         localStorage.setItem('token', res.data.token);
-        navigate('/dashboard');
+        navigate('/market');
       } else {
         setApiError('Login failed. Please try again.');
       }
