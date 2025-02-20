@@ -92,7 +92,7 @@ export const corporateStep3Schema = baseIndividualSchema.pick({
 });
 
 export const otpVerifySchema = z.object({
-  verificationToken: z.string().min(3, 'This field is required.'),
+  verificationCode: z.string().min(3, 'This field is required.'),
 });
 export const resetSchema = z.object({
   email: z.string().email('Email address is incorrect.'),

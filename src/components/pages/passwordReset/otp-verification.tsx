@@ -11,7 +11,7 @@ const OtpVerification = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState<FormData>({
-    code: '',
+    verificationCode: '',
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
@@ -32,7 +32,7 @@ const OtpVerification = () => {
     if (!result.success) {
       const validationErrors = result.error.format();
       setErrors({
-        code: validationErrors.code?._errors[0] || '',
+        code: validationErrors.verificationCode?._errors[0] || '',
       });
       return; // Exit if validation fails
     }
@@ -61,7 +61,7 @@ const OtpVerification = () => {
               'resetEmail'
             )}`}
             name='code'
-            value={formData.code}
+            value={formData.verificationCode}
             onChange={handleChange}
             border={errors.code ? 'border-[#EF4444]' : 'border-[#E8ECEF]'}
             onKeyPress={(event: React.KeyboardEvent<HTMLInputElement>) => {
